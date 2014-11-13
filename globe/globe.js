@@ -104,7 +104,7 @@ DAT.Globe = function(container, opts) {
     shader = Shaders['earth'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-    uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir+'world.jpg');
+    uniforms['texture'].value = THREE.ImageUtils.loadTexture('world.jpg');
 
     material = new THREE.ShaderMaterial({
 
@@ -155,6 +155,36 @@ DAT.Globe = function(container, opts) {
     document.addEventListener('keydown', onDocumentKeyDown, false);
 
     window.addEventListener('resize', onWindowResize, false);
+
+    /* GESTURE STUFF (LG) 
+    =================================================== */
+
+    var gestures = [];
+
+    var Gesture = function (xCoord, yCoord, xCurrent, yCurrent) {
+      this.xCoord = xCoord;
+      this.yCoord = yCoord;
+      this.xCurrent = xCurrent;
+      this.yCurrent = yCurrent;
+    };
+
+    var sampleGest = new Gesture(12,100, 26, 400);
+
+    gestures.push(sampleGest);
+
+    var gestureSensed = new CustomEvent('contact', {
+        'detail' : gestures
+    });
+
+    container.addEventListener('contact', onGesture, false);
+
+    while(gestures.length == 2){
+      container.dispatchEvent(gestureSensed); 
+    }
+
+    
+
+    /*================================================= */
 
     container.addEventListener('mouseover', function() {
       overRenderer = true;
@@ -337,6 +367,17 @@ DAT.Globe = function(container, opts) {
     camera.updateProjectionMatrix();
     renderer.setSize( container.offsetWidth, container.offsetHeight );
   }
+
+  /* MORE OF MY STUFF
+  =================================================================*/
+
+  function onGesture( event ) {
+    console.log('the function was called!');
+    console.log(event.detail[0]);
+    zoom(100);
+  }
+
+  /*===============================================================*/
 
   function zoom(delta) {
     distanceTarget -= delta;
